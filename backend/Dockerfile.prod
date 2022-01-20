@@ -1,0 +1,10 @@
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
+ENV ENV prod
+ENV TZ Asia/Taipei
+ARG TAG
+ARG TAG=0.0.1
+ENV TAG ${TAG}
+ENV WORKER_CLASS="uvicorn.workers.UvicornH11Worker"
+RUN mkdir "/tmp/logs"
+COPY ./app /app
+RUN pip install -r requirements.txt
