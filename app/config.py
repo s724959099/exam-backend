@@ -1,4 +1,8 @@
+"""
+config for server
+"""
 import os
+
 from starlette.config import Config
 
 app_path = os.path.dirname(os.path.realpath(__file__))
@@ -9,3 +13,4 @@ env_file_mapping = {
 }
 env_path = os.path.join(app_path, env_file_mapping.get(env, '.env'))
 config = Config(env_path)
+DEBUG = env == 'dev'
