@@ -1,0 +1,11 @@
+version: '3'
+services:
+  avl-backend:
+    container_name: avl-exam-backend
+    build: .
+    platform: linux/amd64
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app
+      - /tmp:/tmp

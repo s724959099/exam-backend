@@ -1,0 +1,10 @@
+version: '3'
+services:
+  avl-backend:
+    container_name: avl-exam-backend
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app
+      - /tmp:/tmp
