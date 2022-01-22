@@ -38,6 +38,7 @@ jobs:
           DEMO1=123
           DEMO2=${{ secrets.DEMO2 }}
           EOF
+          mv .env.prod app/.env.prod
 
       - uses: whoan/docker-build-with-cache-action@v5
         name: Build & push Docker image

@@ -34,6 +34,7 @@ jobs:
           DEMO1=123
           DEMO2=${{ secrets.DEMO2 }}
           EOF
+          mv .env.prod app/.env.prod
 
       - uses: mr-smithers-excellent/docker-build-push@v5
         name: Build & push Docker image
