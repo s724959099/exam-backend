@@ -1,0 +1,21 @@
+version: '3'
+services:
+
+  backend:
+    # 展示ip地址的容器
+    image: docker.pkg.github.com/s724959099/exam-backend/exam-backend:${BACKEND_TAG}
+    container_name: backend
+    volumes:
+      - /tmp:/tmp
+    ports:
+      - "5000:80"
+    labels:
+      - traefik.http.routers.backend.rule=Host(`api.${DOMAIN}`)
+      - traefik.http.routers.backend.tls=true
+      - traefik.http.routers.backend.tls.certresolver=le
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true

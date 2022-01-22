@@ -1,16 +1,5 @@
 version: '3'
 services:
-  whoami1:
-    image: traefik/whoami
-    container_name: whoami1
-    ports:
-      - "4000:80"
-    labels:
-      - traefik.http.routers.whoami1.rule=Host(`api.${DOMAIN}`)
-      - traefik.http.routers.whoami1.tls=true
-      - traefik.http.routers.whoami1.tls.certresolver=le
-    networks:
-      - traefik-public
   whoami2:
     image: traefik/whoami
     container_name: whoami2
