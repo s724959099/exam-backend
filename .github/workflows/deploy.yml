@@ -1,0 +1,40 @@
+name: Deploy to server
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'get tag version'
+        required: true
+        default: '0.0.1'
+jobs:
+  push_to_registry:
+    name: Push Docker image to GitHub Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Prepare
+        id: prep
+        run: |
+          VERSION=${{ github.event.inputs.tag }}
+          if [ -z "$VERSION" ]
+          then
+            echo "from push"
+            VERSION=${GITHUB_REF#refs/*/}
+          else
+            echo "workflow_dispatch"
+          fi
+
+          echo ::set-output name=version::${VERSION}
+
+
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: ${{ secrets.PORT }}
+          password: ${{ secrets.PASSWORD }}
+          script: /root/backend_deploy.sh ${{ steps.prep.outputs.version }}
+
