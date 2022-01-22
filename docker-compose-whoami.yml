@@ -4,7 +4,7 @@ services:
     image: traefik/whoami
     container_name: whoami2
     ports:
-      - "5000:80"
+      - "4000:80"
     labels:
       - traefik.http.routers.whoami2.rule=Host(`${DOMAIN}`)
       - traefik.http.routers.whoami2.tls=true
