@@ -1,4 +1,4 @@
-name: Deploy to server
+name: Demo
 on:
   workflow_dispatch:
     inputs:
@@ -29,9 +29,9 @@ jobs:
           echo ::set-output name=version::${VERSION}
 
       - name: Create env file
-          run: |
-            cat << EOF > .env.prod
-            DEMO1=123
-            DEMO2=${{ secrets.DEMO2 }}
-            EOF
-            cat .env.prod
+        run: |
+          cat << EOF > .env.prod
+          DEMO1=123
+          DEMO2=${{ secrets.DEMO2 }}
+          EOF
+          cat .env.prod
