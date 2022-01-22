@@ -35,8 +35,8 @@ def get_version():
     """
     return {
         'version': version,
-        'DEMO1': config.get('DEMO1'),
-        'DEMO2': config.get('DEMO2'),
+        'DEMO1': config.get('DEMO1', default=None),
+        'DEMO2': config.get('DEMO2', default=None),
     }
 
 
