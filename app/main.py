@@ -4,7 +4,7 @@ Fastapi server main program
 import os
 
 import uvicorn
-from config import DEBUG
+from config import DEBUG, config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -35,8 +35,8 @@ def get_version():
     """
     return {
         'version': version,
-        'DEMO1': os.environ.get('DEMO1'),
-        'DEMO2': os.environ.get('DEMO2'),
+        'DEMO1': config.get('DEMO1'),
+        'DEMO2': config.get('DEMO2'),
     }
 
 
