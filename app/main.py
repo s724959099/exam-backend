@@ -35,6 +35,8 @@ def get_version():
     """
     return {
         'version': version,
+        'DEMO1': os.environ.get('DEMO1'),
+        'DEMO2': os.environ.get('DEMO2'),
     }
 
 
