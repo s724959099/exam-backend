@@ -4,6 +4,7 @@ Fastapi server main program
 import os
 
 import uvicorn
+from api.router import api_router
 from config import DEBUG, config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +27,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+app.include_router(api_router, prefix='/api')
 
 
 @app.get('/version/')
