@@ -17,7 +17,7 @@ origins = [
     '*',
 ]
 
-secret_key = 'C~u#C$P0T7sdfsdNgnn!vdddS!D2NW{sdfsfG!3'
+secret_key = config.get('session_secret_key')
 app.add_middleware(SessionMiddleware, secret_key=secret_key)
 app.add_middleware(
     CORSMiddleware,

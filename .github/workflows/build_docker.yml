@@ -31,8 +31,7 @@ jobs:
       - name: Create env file
         run: |
           cat << EOF > .env.prod
-          DEMO1=123
-          DEMO2=${{ secrets.DEMO2 }}
+          session_secret_key=${{ secrets.SESSION_SECRET_KEY }}
           EOF
           mv .env.prod app/.env.prod
 
