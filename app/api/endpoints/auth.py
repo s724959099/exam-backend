@@ -46,6 +46,15 @@ async def login():
 
 
 @router.post(
+    '/refresh/',
+    name='Refresh Token'
+)
+async def refresh():
+    """TODO"""
+    pass
+
+
+@router.post(
     '/signup/',
     name='Signup'
 )

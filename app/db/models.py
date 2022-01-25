@@ -6,6 +6,7 @@ import datetime
 
 from config import config
 from pony.orm import Database, Optional, Required
+from utils import encrypt
 
 db = Database()
 
@@ -15,10 +16,27 @@ class User(db.Entity):
     _table_ = 'User'
     email = Required(str, unique=True, index=True)
     name = Required(str)
+    register_from = Required(int)  # 1: web|2: facebook|3: google
+    password = Optional(str, nullable=True)  # only web
+    salt = Optional(str, nullable=True)  # only web
     created_at = Required(datetime.datetime, default=datetime.datetime.now)
     updated_at = Optional(datetime.datetime, nullable=True)
     deleted = Optional(bool, default=False)
     deleted_at = Optional(datetime.datetime, nullable=True)
+
+    def check_password(self, raw_password: str) -> bool:
+        """
+        Compare with encrypted password
+        Args:
+            raw_password: raw passowrd
+        Returns:
+             bool
+        """
+        if self.password is None:
+            return False
+        salt_ = encrypt.transfer_salt_str_to_bytes(self.salt)
+        hashed_password = encrypt.get_hash(raw_password, salt_)
+        return hashed_password == self.password
 
 
 db.bind(

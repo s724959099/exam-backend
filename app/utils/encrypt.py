@@ -1,9 +1,9 @@
 """
 Encrypt user password
 """
-import os
-import hashlib
 import base64
+import hashlib
+import os
 
 
 def get_salt() -> bytes:
