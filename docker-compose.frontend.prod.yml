@@ -1,0 +1,21 @@
+version: '3'
+services:
+
+  frontend:
+    # 展示ip地址的容器
+    image: docker.pkg.github.com/s724959099/exam-frontend/exam-frontend:${FRONTEND_TAG}
+    container_name: frontend
+    volumes:
+      - /tmp:/tmp
+    ports:
+      - "4000:80"
+    labels:
+      - traefik.http.routers.frontend.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.frontend.tls=true
+      - traefik.http.routers.frontend.tls.certresolver=le
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
