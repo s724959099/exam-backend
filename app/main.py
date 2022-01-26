@@ -12,9 +12,62 @@ from fastapi.responses import JSONResponse
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from starlette.middleware.sessions import SessionMiddleware
 from utils.log import setup_logging
+import re
+import inspect
+from fastapi.routing import APIRoute
+from fastapi.openapi.utils import get_openapi
 
 version = os.environ.get('TAG', '0.0.1')
 app = FastAPI(title='AVL-Exam', version=version)
+
+
+def custom_openapi():
+    """Swagger UI page has authorize"""
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    openapi_schema = get_openapi(
+        title="My Auth API",
+        version="1.0",
+        description="An API with an Authorize Button",
+        routes=app.routes,
+    )
+
+    openapi_schema["components"]["securitySchemes"] = {
+        "Bearer Auth": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization",
+            "description": "Enter: **'Bearer &lt;JWT&gt;'**, where JWT is the access token"
+        }
+    }
+
+    # Get all routes where jwt_optional() or jwt_required
+    _api_router = [route for route in app.routes if isinstance(route, APIRoute)]
+
+    for route in _api_router:
+        path = getattr(route, "path")
+        endpoint = getattr(route, "endpoint")
+        methods = [method.lower() for method in getattr(route, "methods")]
+
+        for method in methods:
+            # access_token
+            if (
+                    re.search("jwt_required", inspect.getsource(endpoint)) or
+                    re.search("fresh_jwt_required", inspect.getsource(endpoint)) or
+                    re.search("jwt_optional", inspect.getsource(endpoint))
+            ):
+                openapi_schema["paths"][path][method]["security"] = [
+                    {
+                        "Bearer Auth": []
+                    }
+                ]
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
 app.debug = DEBUG
 origins = [
     '*',
