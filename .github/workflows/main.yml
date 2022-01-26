@@ -36,11 +36,14 @@ jobs:
         run: |
           cat << EOF > .env.prod
           session_secret_key=${{ secrets.SESSION_SECRET_KEY }}
-          DB_USER==${{ secrets.DB_USER }}
-          DB_PASSWORD==${{ secrets.DB_PASSWORD }}
-          DB_HOST==${{ secrets.DB_HOST }}
-          DB_PORT==${{ secrets.DB_PORT }}
-          DB_DATABASE_NAME==${{ secrets.DB_DATABASE_NAME }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_DATABASE_NAME=${{ secrets.DB_DATABASE_NAME }}
+          FRONTEND_BASE_URL=${{ secrets.FRONTEND_BASE_URL }}
+          SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}
+          SENDGRID_FROM_MAIL=${{ secrets.SENDGRID_FROM_MAIL }}
           EOF
           mv .env.prod app/.env.prod
 

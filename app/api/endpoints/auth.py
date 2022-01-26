@@ -70,6 +70,7 @@ async def login(
     user = models.User.get(
         email=user_login.email,
         register_from=1,
+        verify=True,
         deleted=False,
     )
     if not user or not user.check_password(user_login.password):
@@ -91,12 +92,3 @@ async def refresh(authorize: AuthJWT = Depends()):
     new_access_token = authorize.create_access_token(subject=current_user)
     refresh_token = authorize.create_refresh_token(subject=current_user)
     return {'access_token': new_access_token, 'refresh_token': refresh_token}
-
-
-@router.post(
-    '/signup/',
-    name='Signup'
-)
-async def signup():
-    """TODO"""
-    pass

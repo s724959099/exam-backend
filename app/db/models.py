@@ -19,6 +19,8 @@ class User(db.Entity):
     register_from = Required(int)  # 1: web|2: facebook|3: google
     password = Optional(str, nullable=True)  # only web
     salt = Optional(str, nullable=True)  # only web
+    verify = Required(bool, default=False)  # verification from email
+    verify_id = Optional(str, nullable=True)  # for web url
     created_at = Required(datetime.datetime, default=datetime.datetime.now)
     updated_at = Optional(datetime.datetime, nullable=True)
     deleted = Optional(bool, default=False)
