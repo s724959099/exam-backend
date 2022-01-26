@@ -77,16 +77,20 @@ async def login(
 
     access_token = authorize.create_access_token(subject=user_login.email)
     refresh_token = authorize.create_refresh_token(subject=user_login.email)
-    return {"access_token": access_token, "refresh_token": refresh_token}
+    return {'access_token': access_token, 'refresh_token': refresh_token}
 
 
-@router.post(
-    '/refresh/',
-    name='Refresh Token'
-)
-async def refresh():
-    """TODO"""
-    pass
+@router.post('/refresh/', name='Refresh Token')
+def refresh(authorize: AuthJWT = Depends()):
+    """
+    Refresh token by headers
+    """
+    authorize.jwt_refresh_token_required()
+
+    current_user = authorize.get_jwt_subject()
+    new_access_token = authorize.create_access_token(subject=current_user)
+    refresh_token = authorize.create_refresh_token(subject=current_user)
+    return {'access_token': new_access_token, 'refresh_token': refresh_token}
 
 
 @router.get(
@@ -100,7 +104,7 @@ async def demo(
     authorize.jwt_required()
 
     current_user = authorize.get_jwt_subject()
-    return {"user": current_user}
+    return {'user': current_user}
 
 
 @router.post(
