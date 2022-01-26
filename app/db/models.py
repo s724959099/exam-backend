@@ -48,4 +48,5 @@ db.bind(
     host=config.get('DB_HOST'),
     port=config.get('DB_PORT'),
     database=config.get('DB_DATABASE_NAME'))
-db.generate_mapping(create_tables=True)
+print(config.get('DB_HOST'),config.get('DB_DATABASE_NAME'))
+db.generate_mapping()
