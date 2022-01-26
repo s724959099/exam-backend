@@ -17,8 +17,9 @@ import inspect
 from fastapi.routing import APIRoute
 from fastapi.openapi.utils import get_openapi
 
-version = os.environ.get('TAG', '0.0.1')
-app = FastAPI(title='AVL-Exam', version=version)
+FAST_API_TITLE = 'AVL-Exam'
+VERSION = os.environ.get('TAG', '0.0.1')
+app = FastAPI(title=FAST_API_TITLE, version=VERSION)
 
 
 def custom_openapi():
@@ -27,9 +28,8 @@ def custom_openapi():
         return app.openapi_schema
 
     openapi_schema = get_openapi(
-        title="My Auth API",
-        version="1.0",
-        description="An API with an Authorize Button",
+        title=FAST_API_TITLE,
+        version=VERSION,
         routes=app.routes,
     )
 
