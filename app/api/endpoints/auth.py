@@ -81,7 +81,7 @@ async def login(
 
 
 @router.post('/refresh/', name='Refresh Token')
-def refresh(authorize: AuthJWT = Depends()):
+async def refresh(authorize: AuthJWT = Depends()):
     """
     Refresh token by headers
     """

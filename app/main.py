@@ -66,6 +66,10 @@ def custom_openapi():
                     re.search(
                         'jwt_optional',
                         inspect.getsource(endpoint)
+                    ) or
+                    re.search(
+                        'jwt_refresh_token_required',
+                        inspect.getsource(endpoint)
                     )
             ):
                 openapi_schema['paths'][path][method]['security'] = [
