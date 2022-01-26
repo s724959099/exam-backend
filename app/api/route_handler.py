@@ -15,7 +15,10 @@ from utils.log import logger
 
 
 class GzipRequest(Request):
+    """For custom_route_handler"""
+
     async def body(self) -> bytes:
+        """Get data and store it as a variable"""
         if not hasattr(self, '_body'):
             body = await super().body()
             # noinspection PyAttributeOutsideInit
