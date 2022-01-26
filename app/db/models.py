@@ -47,9 +47,3 @@ db.bind(
     port=config.get('DB_PORT'),
     database=config.get('DB_DATABASE_NAME'))
 db.generate_mapping(create_tables=True)
-if __name__ == '__main__':
-    from pony.orm import db_session
-
-    with db_session:
-        user = User.get(email='test')
-        print()

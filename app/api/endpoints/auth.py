@@ -93,20 +93,6 @@ def refresh(authorize: AuthJWT = Depends()):
     return {'access_token': new_access_token, 'refresh_token': refresh_token}
 
 
-@router.get(
-    '/demo/',
-    name='Refresh Token'
-)
-async def demo(
-        authorize: AuthJWT = Depends(),
-):
-    """TODO"""
-    authorize.jwt_required()
-
-    current_user = authorize.get_jwt_subject()
-    return {'user': current_user}
-
-
 @router.post(
     '/signup/',
     name='Signup'
