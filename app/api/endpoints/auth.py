@@ -82,7 +82,7 @@ async def login(
     # Set the JWT cookies in the response
     authorize.set_access_cookies(access_token)
     authorize.set_refresh_cookies(refresh_token)
-    return {"msg": "Successfully login"}
+    return {'msg': 'Successfully login'}
 
 
 @router.post('/refresh/', name='Refresh Token')
@@ -99,7 +99,7 @@ async def refresh(authorize: AuthJWT = Depends()):
     # Set the JWT cookies in the response
     authorize.set_access_cookies(access_token)
     authorize.set_refresh_cookies(refresh_token)
-    return {"msg": "The token has been refresh"}
+    return {'msg': 'The token has been refresh'}
 
 
 @router.delete('/logout/')
@@ -111,4 +111,11 @@ async def logout(authorize: AuthJWT = Depends()):
     """
     authorize.jwt_required()
     authorize.unset_jwt_cookies()
-    return {"msg": "Successfully logout"}
+    return {'msg': 'Successfully logout'}
+
+
+@router.post('/demo/', name='Refresh Token')
+async def demo(authorize: AuthJWT = Depends()):
+    authorize.jwt_required()
+    current_user = authorize.get_jwt_subject()
+    return {'current_user': current_user}

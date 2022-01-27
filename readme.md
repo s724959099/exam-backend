@@ -11,3 +11,6 @@ DB_HOST=
 DB_PORT=
 DB_DATABASE_NAME=
 ```
+
+## How to use swagger about CSRF-TOKEN
+https://github.com/IndominusByte/fastapi-jwt-auth/issues/34#issuecomment-766918994

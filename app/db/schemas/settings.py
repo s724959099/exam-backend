@@ -1,6 +1,6 @@
 """Settings schemas"""
-from pydantic import BaseModel
 from config import config
+from pydantic import BaseModel
 
 
 class Settings(BaseModel):

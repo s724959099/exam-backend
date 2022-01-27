@@ -22,6 +22,7 @@ class User(db.Entity):
     verify = Required(bool, default=False)  # verification from email
     verify_id = Optional(str, nullable=True)  # for web url
     login_count = Required(int, default=0)
+    last_login_time = Required(datetime.datetime, default=datetime.datetime.now)
     created_at = Required(datetime.datetime, default=datetime.datetime.now)
     updated_at = Optional(datetime.datetime, nullable=True)
     deleted = Optional(bool, default=False)

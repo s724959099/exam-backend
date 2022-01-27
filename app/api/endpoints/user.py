@@ -5,11 +5,11 @@ import datetime
 import uuid
 
 from api.route_handler import init_router_with_log
-from fastapi.responses import JSONResponse
 from config import config
 from db import models, schemas
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
+from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from pony.orm import db_session, flush
 from utils import encrypt, mail
@@ -102,4 +102,4 @@ async def verify(
     # Set the JWT cookies in the response
     authorize.set_access_cookies(access_token)
     authorize.set_refresh_cookies(refresh_token)
-    return {"msg": "Successfully verify"}
+    return {'msg': 'Successfully verify'}

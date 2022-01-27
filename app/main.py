@@ -26,28 +26,58 @@ def custom_openapi():
     """Swagger UI page has authorize"""
     if app.openapi_schema:
         return app.openapi_schema
-
     openapi_schema = get_openapi(
         title=FAST_API_TITLE,
         version=VERSION,
         routes=app.routes,
     )
+    openapi_schema['info']['x-logo'] = {
+        'url': 'https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png'
+    }
 
-    openapi_schema['components']['securitySchemes'] = {
-        'Bearer Auth': {
+    cookie_security_schemes = {
+        'AuthJWTCookieAccess': {
             'type': 'apiKey',
             'in': 'header',
-            'name': 'Authorization',
-            'description': ("Enter: **'Bearer &lt;JWT&gt;'**, "
-                            'where JWT is the access token')
+            'name': "'X-CSRF-TOKEN'"
+        },
+        'AuthJWTCookieRefresh': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'X-CSRF-TOKEN'
+        }
+    }
+    refresh_token_cookie = {
+        'name': 'refresh_token_cookie',
+        'in': 'cookie',
+        'required': False,
+        'schema': {
+            'title': 'refresh_token_cookie',
+            'type': 'string'
+        }
+    }
+    access_token_cookie = {
+        'name': 'access_token_cookie',
+        'in': 'cookie',
+        'required': False,
+        'schema': {
+            'title': 'access_token_cookie',
+            'type': 'string'
         }
     }
 
-    # Get all routes where jwt_optional() or jwt_required
-    api_routers = [route for route in app.routes
-                   if isinstance(route, APIRoute)]
+    if 'components' in openapi_schema:
+        openapi_schema['components'].update(
+            {'securitySchemes': cookie_security_schemes}
+        )
+    else:
+        openapi_schema['components'] = {
+            'securitySchemes': cookie_security_schemes
+        }
 
-    for route in api_routers:
+    api_router_ = [route for route in app.routes if isinstance(route, APIRoute)]
+
+    for route in api_router_:
         path = getattr(route, 'path')
         endpoint = getattr(route, 'endpoint')
         methods = [method.lower() for method in getattr(route, 'methods')]
@@ -55,28 +85,47 @@ def custom_openapi():
         for method in methods:
             # access_token
             if (
-                    re.search(
-                        'jwt_required',
-                        inspect.getsource(endpoint)
-                    ) or
+                    re.search('jwt_required', inspect.getsource(endpoint)) or
                     re.search(
                         'fresh_jwt_required',
                         inspect.getsource(endpoint)
                     ) or
-                    re.search(
-                        'jwt_optional',
-                        inspect.getsource(endpoint)
-                    ) or
-                    re.search(
-                        'jwt_refresh_token_required',
-                        inspect.getsource(endpoint)
-                    )
+                    re.search('jwt_optional', inspect.getsource(endpoint))
             ):
-                openapi_schema['paths'][path][method]['security'] = [
-                    {
-                        'Bearer Auth': []
-                    }
-                ]
+                try:
+                    openapi_schema['paths'][path][method]['parameters'].append(
+                        access_token_cookie
+                    )
+                except KeyError:
+                    openapi_schema['paths'][path][method].update(
+                        {'parameters': [access_token_cookie]}
+                    )
+
+                # method GET doesn't need to pass X-CSRF-TOKEN
+                if method != 'get':
+                    openapi_schema['paths'][path][method].update({
+                        'security': [{'AuthJWTCookieAccess': []}]
+                    })
+
+            # refresh_token
+            if re.search(
+                    'jwt_refresh_token_required',
+                    inspect.getsource(endpoint)
+            ):
+                try:
+                    openapi_schema['paths'][path][method]['parameters'].append(
+                        refresh_token_cookie
+                    )
+                except KeyError:
+                    openapi_schema['paths'][path][method].update(
+                        {'parameters': [refresh_token_cookie]}
+                    )
+
+                # method GET doesn't need to pass X-CSRF-TOKEN
+                if method != 'get':
+                    openapi_schema['paths'][path][method].update({
+                        'security': [{'AuthJWTCookieRefresh': []}]
+                    })
 
     app.openapi_schema = openapi_schema
     return app.openapi_schema
@@ -118,7 +167,8 @@ def authjwt_exception_handler(
 ):
     """
     Catch all AuthJWTException
-    custom all 422 auth exception is 403 (signature fail code is same with valueerror in pydantic)
+    custom all 422 auth exception is 403
+    (signature fail code is same with valueerror in pydantic)
     """
     status_code = exc.status_code
     if status_code == 422:
