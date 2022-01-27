@@ -85,7 +85,7 @@ def custom_openapi():
 app.openapi = custom_openapi
 app.debug = DEBUG
 origins = [
-    '*',
+    config.get('FRONTEND_BASE_URL'),
 ]
 
 secret_key = config.get('session_secret_key')
@@ -118,9 +118,13 @@ def authjwt_exception_handler(
 ):
     """
     Catch all AuthJWTException
+    custom all 422 auth exception is 402 (signature fail code is same with valueerror in pydantic)
     """
+    status_code = exc.status_code
+    if status_code == 422:
+        status_code = 402
     return JSONResponse(
-        status_code=exc.status_code,
+        status_code=status_code,
         content={'detail': exc.message}
     )
 

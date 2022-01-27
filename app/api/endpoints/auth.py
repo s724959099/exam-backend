@@ -78,7 +78,11 @@ async def login(
 
     access_token = authorize.create_access_token(subject=user_login.email)
     refresh_token = authorize.create_refresh_token(subject=user_login.email)
-    return {'access_token': access_token, 'refresh_token': refresh_token}
+
+    # Set the JWT cookies in the response
+    authorize.set_access_cookies(access_token)
+    authorize.set_refresh_cookies(refresh_token)
+    return {"msg": "Successfully login"}
 
 
 @router.post('/refresh/', name='Refresh Token')
@@ -89,6 +93,22 @@ async def refresh(authorize: AuthJWT = Depends()):
     authorize.jwt_refresh_token_required()
 
     current_user = authorize.get_jwt_subject()
-    new_access_token = authorize.create_access_token(subject=current_user)
+    access_token = authorize.create_access_token(subject=current_user)
     refresh_token = authorize.create_refresh_token(subject=current_user)
-    return {'access_token': new_access_token, 'refresh_token': refresh_token}
+
+    # Set the JWT cookies in the response
+    authorize.set_access_cookies(access_token)
+    authorize.set_refresh_cookies(refresh_token)
+    return {"msg": "The token has been refresh"}
+
+
+@router.delete('/logout/')
+async def logout(authorize: AuthJWT = Depends()):
+    """
+    Because the JWT are stored in an httponly cookie now, we cannot
+    log the user out by simply deleting the cookies in the frontend.
+    We need the backend to send us a response to delete the cookies.
+    """
+    authorize.jwt_required()
+    authorize.unset_jwt_cookies()
+    return {"msg": "Successfully logout"}

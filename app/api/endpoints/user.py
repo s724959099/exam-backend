@@ -58,7 +58,7 @@ async def signup(
     salt = encrypt.get_salt()
     hash_password = encrypt.get_hash(usersignup.password, salt)
     verify_id = str(uuid.uuid4())
-    verify_url = f'{config.get("FRONTEND_BASE_URL")}user/verify/{verify_id}'
+    verify_url = f'{config.get("FRONTEND_BASE_URL")}/user/verify/{verify_id}'
     models.User(
         email=usersignup.email,
         name=usersignup.name,
@@ -98,4 +98,8 @@ async def verify(
         user.verify_id = None
     access_token = authorize.create_access_token(subject=user.email)
     refresh_token = authorize.create_refresh_token(subject=user.email)
-    return {'access_token': access_token, 'refresh_token': refresh_token}
+
+    # Set the JWT cookies in the response
+    authorize.set_access_cookies(access_token)
+    authorize.set_refresh_cookies(refresh_token)
+    return {"msg": "Successfully verify"}
