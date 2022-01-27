@@ -118,11 +118,11 @@ def authjwt_exception_handler(
 ):
     """
     Catch all AuthJWTException
-    custom all 422 auth exception is 402 (signature fail code is same with valueerror in pydantic)
+    custom all 422 auth exception is 403 (signature fail code is same with valueerror in pydantic)
     """
     status_code = exc.status_code
     if status_code == 422:
-        status_code = 402
+        status_code = 403
     return JSONResponse(
         status_code=status_code,
         content={'detail': exc.message}
