@@ -5,6 +5,7 @@ import datetime
 import uuid
 
 from api.route_handler import init_router_with_log
+from api.deps import update_user_from_jwt
 from config import config
 from db import models, schemas
 from fastapi import Depends
@@ -20,7 +21,8 @@ router = init_router_with_log()
 @db_session
 @router.get(
     '/profile/',
-    name='Self User profile'
+    name='Self User profile',
+    response_model=schemas.UserResponse
 )
 async def profile(
         authorize: AuthJWT = Depends(),
@@ -30,20 +32,10 @@ async def profile(
     Raises:
         raise 404 for Not found
     """
-    authorize.jwt_required()
-    email = authorize.get_jwt_subject()
-    user = models.User.get(
-        email=email,
-        verify=True,
-        deleted=False,
-    )
+    user = update_user_from_jwt(authorize)
     if not user:
         raise HTTPException(status_code=404, detail='Not found user')
-    return {
-        'name': user.name,
-        'email': user.email,
-        'created_at': user.created_at
-    }
+    return user
 
 
 @db_session
@@ -89,13 +81,14 @@ async def verify(
         authorize: AuthJWT = Depends(),
 ):
     """Verify by id"""
-    user = models.User.get(verify_id=verify_id)
+    user = models.User.get(verify_id=verify_id, deleted=False)
     if not user:
         return JSONResponse(status_code=404, content=dict(msg='not found'))
     with db_session:
         user.updated_at = datetime.datetime.now()
         user.verify = True
         user.verify_id = None
+        user.last_login_time = datetime.datetime.now()
     access_token = authorize.create_access_token(subject=user.email)
     refresh_token = authorize.create_refresh_token(subject=user.email)
 

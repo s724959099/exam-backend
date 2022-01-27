@@ -87,6 +87,10 @@ def custom_openapi():
             if (
                     re.search('jwt_required', inspect.getsource(endpoint)) or
                     re.search(
+                        'update_user_from_jwt',
+                        inspect.getsource(endpoint)
+                    ) or
+                    re.search(
                         'fresh_jwt_required',
                         inspect.getsource(endpoint)
                     ) or

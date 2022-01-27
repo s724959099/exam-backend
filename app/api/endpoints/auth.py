@@ -1,12 +1,15 @@
 """
 Auth api
 """
+import datetime
+
 from api.route_handler import init_router_with_log
 from db import models, schemas
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from fastapi_jwt_auth import AuthJWT
 from pony.orm import db_session
+from api.deps import update_user_from_jwt
 
 router = init_router_with_log()
 
@@ -95,6 +98,11 @@ async def refresh(authorize: AuthJWT = Depends()):
     current_user = authorize.get_jwt_subject()
     access_token = authorize.create_access_token(subject=current_user)
     refresh_token = authorize.create_refresh_token(subject=current_user)
+    user = models.User.get(email=current_user, deleted=False)
+    # update user last_login_time
+    if user:
+        with db_session:
+            user.last_login_time = datetime.datetime.now()
 
     # Set the JWT cookies in the response
     authorize.set_access_cookies(access_token)
@@ -109,13 +117,6 @@ async def logout(authorize: AuthJWT = Depends()):
     log the user out by simply deleting the cookies in the frontend.
     We need the backend to send us a response to delete the cookies.
     """
-    authorize.jwt_required()
+    update_user_from_jwt(authorize)
     authorize.unset_jwt_cookies()
     return {'msg': 'Successfully logout'}
-
-
-@router.post('/demo/', name='Refresh Token')
-async def demo(authorize: AuthJWT = Depends()):
-    authorize.jwt_required()
-    current_user = authorize.get_jwt_subject()
-    return {'current_user': current_user}
