@@ -119,3 +119,51 @@ async def verify(
     authorize.set_access_cookies(access_token)
     authorize.set_refresh_cookies(refresh_token)
     return {'msg': 'Successfully verify'}
+
+
+# noinspection PyTypeChecker,PyChainedComparisons
+@router.get(
+    '/statistics/',
+    name='Statistics'
+)
+async def statistics(
+        authorize: AuthJWT = Depends(),
+):
+    """
+    Returns:
+         {
+            'sign_up_count': <int>, # Total number of users who have signed up.
+            'today_active_count': <int>, # Total number of users with active sessions today.
+            'last_7days_active_avg': <float> # Average number of active session users in the last 7 days rolling.
+         }
+    """
+    update_user_from_jwt(authorize)
+    # get sign up count
+    sign_up_count = models.User.select(lambda x: not x.deleted).count()
+
+    # get today active sessions
+    today = datetime.datetime.today()
+    today_st = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_ed = today.replace(hour=23, minute=59, second=59, microsecond=59)
+    today_active_count = models.User.select(
+        lambda x:
+        not x.deleted and
+        today_ed >= x.last_login_time and
+        x.last_login_time >= today_st
+    ).count()
+
+    # Average number of active session users in the last 7 days rolling.
+    before7_day_st = today - datetime.timedelta(days=7)
+    before7_day_st = before7_day_st.replace(hour=0, minute=0, second=0, microsecond=0)
+    last_7days_active_avg = models.User.select(
+        lambda x:
+        not x.deleted and
+        today_ed >= x.last_login_time and
+        x.last_login_time >= before7_day_st
+    ).count() / 7
+    last_7days_active_avg = round(last_7days_active_avg, 2)
+    return {
+        'sign_up_count': sign_up_count,
+        'today_active_count': today_active_count,
+        'last_7days_active_avg': last_7days_active_avg,
+    }
