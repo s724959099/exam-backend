@@ -12,7 +12,7 @@ from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
-from pony.orm import db_session, flush
+from pony.orm import db_session
 from utils import encrypt, mail
 
 router = init_router_with_log()
@@ -40,6 +40,30 @@ async def profile(
 
 @db_session
 @router.post(
+    '/reset-password/',
+    name='Reset password'
+)
+async def reset_password(
+        user_reset_password: schemas.UserResetPassword,
+        authorize: AuthJWT = Depends(),
+):
+    """
+    User reset password
+    Raises:
+        422 -> password is not correct
+    """
+    user = update_user_from_jwt(authorize, use_db_session=False)
+    if not user.check_password(user_reset_password.old_password):
+        raise HTTPException(status_code=422, detail='password is not correct')
+    salt = encrypt.get_salt()
+    hash_password = encrypt.get_hash(user_reset_password.new_password, salt)
+    user.salt = encrypt.transfter_salt_to_str(salt)
+    user.password = hash_password
+    user.updated_at = datetime.datetime.now()
+    return {'msg': 'success'}
+
+
+@router.post(
     '/signup/',
     name='Signup'
 )
@@ -51,16 +75,16 @@ async def signup(
     hash_password = encrypt.get_hash(usersignup.password, salt)
     verify_id = str(uuid.uuid4())
     verify_url = f'{config.get("FRONTEND_BASE_URL")}/user/verify/{verify_id}'
-    models.User(
-        email=usersignup.email,
-        name=usersignup.name,
-        register_from=1,
-        password=hash_password,
-        salt=encrypt.transfter_salt_to_str(salt),
-        verify=False,
-        verify_id=verify_id
-    )
-    flush()
+    with db_session:
+        models.User(
+            email=usersignup.email,
+            name=usersignup.name,
+            register_from=1,
+            password=hash_password,
+            salt=encrypt.transfter_salt_to_str(salt),
+            verify=False,
+            verify_id=verify_id
+        )
     mail.send_email(
         to=usersignup.email,
         subject='Verify your account',
@@ -71,7 +95,6 @@ async def signup(
     }
 
 
-@db_session
 @router.get(
     '/verify/{verify_id}/',
     name='Verify user by verify id'
