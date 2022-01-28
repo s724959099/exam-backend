@@ -4,8 +4,8 @@ Usr api
 import datetime
 import uuid
 
-from api.route_handler import init_router_with_log
 from api.deps import update_user_from_jwt
+from api.route_handler import init_router_with_log
 from config import config
 from db import models, schemas
 from fastapi import Depends
@@ -133,8 +133,11 @@ async def statistics(
     Returns:
          {
             'sign_up_count': <int>, # Total number of users who have signed up.
-            'today_active_count': <int>, # Total number of users with active sessions today.
-            'last_7days_active_avg': <float> # Average number of active session users in the last 7 days rolling.
+            'today_active_count':
+            <int>, # Total number of users with active sessions today.
+            'last_7days_active_avg':
+            <float>
+            # Average number of active session users in the last 7 days rolling.
          }
     """
     update_user_from_jwt(authorize)
@@ -154,7 +157,9 @@ async def statistics(
 
     # Average number of active session users in the last 7 days rolling.
     before7_day_st = today - datetime.timedelta(days=7)
-    before7_day_st = before7_day_st.replace(hour=0, minute=0, second=0, microsecond=0)
+    before7_day_st = before7_day_st.replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
     last_7days_active_avg = models.User.select(
         lambda x:
         not x.deleted and

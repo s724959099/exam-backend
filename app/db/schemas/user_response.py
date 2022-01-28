@@ -13,7 +13,9 @@ class UserResponse(BaseModel):
     register_from: int = Field(..., description='register_from')
     verify: str = Field(..., description='verify')
     login_count: int = Field(..., description='login_count')
-    last_login_time: datetime.datetime = Field(..., description='last_login_time')
+    last_login_time: datetime.datetime = Field(
+        ..., description='last_login_time'
+    )
     created_at: datetime.datetime = Field(..., description='created_at')
 
     class Config:

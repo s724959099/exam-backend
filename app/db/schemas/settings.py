@@ -8,7 +8,7 @@ class Settings(BaseModel):
     Jwt auth setting
     """
     authjwt_secret_key: str = config.get('session_secret_key')
-    authjwt_token_location: set = {"cookies"}
+    authjwt_token_location: set = {'cookies'}
     authjwt_cookie_secure: bool = False
     authjwt_cookie_csrf_protect: bool = True
     # add expire time for testing

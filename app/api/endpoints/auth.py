@@ -3,13 +3,13 @@ Auth api
 """
 import datetime
 
+from api.deps import update_user_from_jwt
 from api.route_handler import init_router_with_log
 from db import models, schemas
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from fastapi_jwt_auth import AuthJWT
 from pony.orm import db_session
-from api.deps import update_user_from_jwt
 
 router = init_router_with_log()
 

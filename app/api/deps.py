@@ -2,7 +2,6 @@
 API functions
 """
 import datetime
-import typing
 
 from db import models
 from fastapi_jwt_auth import AuthJWT

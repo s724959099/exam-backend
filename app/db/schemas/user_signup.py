@@ -16,7 +16,7 @@ class UserSignup(BaseModel):
 
     # noinspection PyMethodParameters
     @validator('password')
-    def password_validate(cls, v):
+    def password_validate(cls, v):  # pylint: disable=E0213 It is pydantic syntax
         """
         Password validate
         - contains at least one lower character
@@ -40,9 +40,12 @@ class UserSignup(BaseModel):
 
     # noinspection PyMethodParameters
     @validator('email')
-    def email_validate(cls, v):
+    def email_validate(cls, v):  # pylint: disable=E0213 It is pydantic syntax
         """Email formtat validate and user register"""
-        pattern = re.compile(r'^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$')
+        pattern = re.compile(
+            r'^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+'
+            r'((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$'
+        )
         if not pattern.match(v):
             raise ValueError('Please input email format')
 
