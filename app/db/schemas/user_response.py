@@ -11,7 +11,7 @@ class UserResponse(BaseModel):
     email: str = Field(..., description='email')
     name: str = Field(..., description='name')
     register_from: int = Field(..., description='register_from')
-    verify: str = Field(..., description='verify')
+    verify: bool = Field(..., description='verify')
     login_count: int = Field(..., description='login_count')
     last_login_time: datetime.datetime = Field(
         None, description='last_login_time'
