@@ -4,7 +4,7 @@ Usr api
 import datetime
 import uuid
 
-from api.deps import update_user_from_jwt
+from api.deps import Pagination, get_pagination_schema, update_user_from_jwt
 from api.route_handler import init_router_with_log
 from config import config
 from db import models, schemas
@@ -36,6 +36,21 @@ async def profile(
     if not user:
         raise HTTPException(status_code=404, detail='Not found user')
     return user
+
+
+@router.get(
+    '/',
+    name='Get All users',
+    response_model=get_pagination_schema(schemas.UserResponse),
+)
+async def get_users(
+        page: Pagination = Depends(),
+        authorize: AuthJWT = Depends(),
+):
+    """Get all users"""
+    update_user_from_jwt(authorize)
+    query = models.User.select()
+    return await page.paginate(query)
 
 
 @db_session

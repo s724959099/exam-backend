@@ -14,7 +14,7 @@ class UserResponse(BaseModel):
     verify: str = Field(..., description='verify')
     login_count: int = Field(..., description='login_count')
     last_login_time: datetime.datetime = Field(
-        ..., description='last_login_time'
+        None, description='last_login_time'
     )
     created_at: datetime.datetime = Field(..., description='created_at')
 
