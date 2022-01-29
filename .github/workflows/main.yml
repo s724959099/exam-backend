@@ -44,6 +44,8 @@ jobs:
           FRONTEND_BASE_URL=${{ secrets.FRONTEND_BASE_URL }}
           SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}
           SENDGRID_FROM_MAIL=${{ secrets.SENDGRID_FROM_MAIL }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
           EOF
           mv .env.prod app/.env.prod
 

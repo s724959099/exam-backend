@@ -68,8 +68,13 @@ async def reset_password(
         422 -> password is not correct
     """
     user = update_user_from_jwt(authorize, use_db_session=False)
+    if user.register_from != 1:
+        raise HTTPException(
+            status_code=422,
+            detail='Signup is not using password'
+        )
     if not user.check_password(user_reset_password.old_password):
-        raise HTTPException(status_code=422, detail='password is not correct')
+        raise HTTPException(status_code=422, detail='Password is not correct')
     salt = encrypt.get_salt()
     hash_password = encrypt.get_hash(user_reset_password.new_password, salt)
     user.salt = encrypt.transfter_salt_to_str(salt)

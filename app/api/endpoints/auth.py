@@ -2,16 +2,33 @@
 Auth api
 """
 import datetime
+from urllib.parse import urljoin
 
 from api.deps import update_user_from_jwt
 from api.route_handler import init_router_with_log
+from authlib.integrations.starlette_client import OAuth
+from config import config
 from db import models, schemas
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
+from fastapi.responses import RedirectResponse
 from fastapi_jwt_auth import AuthJWT
 from pony.orm import db_session
+from starlette.config import Config
 
 router = init_router_with_log()
+
+config_data = {
+    'GOOGLE_CLIENT_ID': config.get('GOOGLE_CLIENT_ID'),
+    'GOOGLE_CLIENT_SECRET': config.get('GOOGLE_CLIENT_SECRET')
+}
+starlette_config = Config(environ=config_data)
+oauth = OAuth(starlette_config)
+oauth.register(
+    name='google',
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',  # pylint: disable=C0301
+    client_kwargs={'scope': 'openid email profile'},
+)
 
 
 @AuthJWT.load_config
@@ -25,18 +42,51 @@ def get_config():
 
 
 @router.get('/login/google/', name='Google Auth login')
-async def google_login():
-    """TODO"""
-    pass
+async def google_login(request: Request):
+    """Login with google auth"""
+    redirect_uri = urljoin(
+        str(request.base_url),
+        '/api/auth/login/google/authorized/'
+    )
+    return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
 @router.get(
     '/login/google/authorized/',
     name='Google Oauth authorized redirect'
 )
-async def google_login_authorized():
-    """TODO"""
-    pass
+async def google_login_authorized(
+        request: Request,
+        authorize: AuthJWT = Depends()
+):
+    """
+    Get google authorized
+    Signup user if email is not found
+    Create new acctess_token in cookie then redirect to frontent
+    """
+    # get user from token
+    token = await oauth.google.authorize_access_token(request)
+    user_data = await oauth.google.parse_id_token(request, token)
+    # get user or signup a user
+    user = models.User.get(email=user_data['email'])
+    if not user:
+        with db_session:
+            models.User(
+                email=user_data['email'],
+                name=user_data['name'],
+                register_from=3,  # google
+                verify=True,
+            )
+
+    access_token = authorize.create_access_token(subject=user_data['email'])
+    refresh_token = authorize.create_refresh_token(subject=user_data['email'])
+
+    # Set the JWT cookies in the response
+    frontend_uri = urljoin(config.get('FRONTEND_BASE_URL'), '/dashboard')
+    response = RedirectResponse(frontend_uri)
+    authorize.set_access_cookies(access_token, response)
+    authorize.set_refresh_cookies(refresh_token, response)
+    return response
 
 
 @router.get('/login/facebook/', name='Facebook Auth login')
