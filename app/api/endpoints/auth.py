@@ -18,9 +18,16 @@ from starlette.config import Config
 
 router = init_router_with_log()
 
+"""
+FACEBOOK_CLIENT_ID	Your Facebook client ID
+FACEBOOK_CLIENT_SECRET	Your Facebook client secret
+FACEBOOK_CLIENT_KWARGS	Configure scope and other things
+"""
 config_data = {
     'GOOGLE_CLIENT_ID': config.get('GOOGLE_CLIENT_ID'),
-    'GOOGLE_CLIENT_SECRET': config.get('GOOGLE_CLIENT_SECRET')
+    'GOOGLE_CLIENT_SECRET': config.get('GOOGLE_CLIENT_SECRET'),
+    'FACEBOOK_CLIENT_ID': '368799821266751',
+    'FACEBOOK_CLIENT_SECRET': 'cb8165436131276655ea979abd7fb0fd',
 }
 starlette_config = Config(environ=config_data)
 oauth = OAuth(starlette_config)
@@ -28,6 +35,13 @@ oauth.register(
     name='google',
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',  # pylint: disable=C0301
     client_kwargs={'scope': 'openid email profile'},
+)
+oauth.register(
+    name='facebook',
+    api_base_url='https://graph.facebook.com/v7.0/',
+    access_token_url='https://graph.facebook.com/v7.0/oauth/access_token',
+    authorize_url='https://www.facebook.com/v7.0/dialog/oauth',
+    client_kwargs={'scope': 'email public_profile'},
 )
 
 
@@ -90,18 +104,54 @@ async def google_login_authorized(
 
 
 @router.get('/login/facebook/', name='Facebook Auth login')
-async def facebook_login():
-    """TODO"""
-    pass
+async def facebook_login(request: Request):
+    """Login with facebook auth"""
+    redirect_uri = urljoin(
+        str(request.base_url),
+        '/api/auth/login/facebook/authorized/'
+    )
+    return await oauth.facebook.authorize_redirect(request, redirect_uri)
 
 
 @router.get(
     '/login/facebook/authorized/',
     name='Facebook Oauth authorized redirect'
 )
-async def facebook_login_authorized():
-    """TODO"""
-    pass
+async def facebook_login_authorized(
+        request: Request,
+        # authorize: AuthJWT = Depends()
+):
+    """
+    Get facebook authorized
+    Signup user if email is not found
+    Create new acctess_token in cookie then redirect to frontent
+    """
+    # get user from token
+    token = await oauth.facebook.authorize_access_token(request)
+    user_data = await oauth.facebook.parse_id_token(request, token)
+    return {
+        'user': user_data
+    }
+    # # get user or signup a user
+    # user = models.User.get(email=user_data['email'])
+    # if not user:
+    #     with db_session:
+    #         models.User(
+    #             email=user_data['email'],
+    #             name=user_data['name'],
+    #             register_from=2,  # facebook
+    #             verify=True,
+    #         )
+    #
+    # access_token = authorize.create_access_token(subject=user_data['email'])
+    # refresh_token = authorize.create_refresh_token(subject=user_data['email'])
+    #
+    # # Set the JWT cookies in the response
+    # frontend_uri = urljoin(config.get('FRONTEND_BASE_URL'), '/dashboard')
+    # response = RedirectResponse(frontend_uri)
+    # authorize.set_access_cookies(access_token, response)
+    # authorize.set_refresh_cookies(refresh_token, response)
+    # return response
 
 
 @db_session
