@@ -6,7 +6,7 @@ import os
 import re
 
 import uvicorn
-# from api.router import api_router
+from api.router import api_router
 from config import DEBUG, config
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -135,15 +135,14 @@ def custom_openapi():
     return app.openapi_schema
 
 
-# app.openapi = custom_openapi
-# app.debug = DEBUG
+app.openapi = custom_openapi
+app.debug = DEBUG
 origins = [
-    # 'http://localhost:3000',
-    # 'http://avl-exam.tk',
-    # 'https://avl-exam.tk',
-    # 'http://avl-exam.tk/',
-    # 'https://avl-exam.tk/',
-    '*'
+    'http://localhost:3000',
+    'http://avl-exam.tk',
+    'https://avl-exam.tk',
+    'http://avl-exam.tk/',
+    'https://avl-exam.tk/',
 ]
 logger.info(f'frontned url: {config.get("FRONTEND_BASE_URL")}')
 secret_key = config.get('session_secret_key')
