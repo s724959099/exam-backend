@@ -60,10 +60,9 @@ def get_config():
 async def google_login(request: Request):
     """Login with google auth"""
     redirect_uri = urljoin(
-        str(request.base_url),
+        config.get('BACKEND_BASE_URL'),
         '/api/auth/login/google/authorized/'
     )
-    logger.info(f'google redirect uri: {redirect_uri}')
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
@@ -109,7 +108,7 @@ async def google_login_authorized(
 async def facebook_login(request: Request):
     """Login with facebook auth"""
     redirect_uri = urljoin(
-        str(request.base_url),
+        config.get('BACKEND_BASE_URL'),
         '/api/auth/login/facebook/authorized/'
     )
     return await oauth.facebook.authorize_redirect(request, redirect_uri)
