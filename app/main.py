@@ -6,7 +6,7 @@ import os
 import re
 
 import uvicorn
-from api.router import api_router
+# from api.router import api_router
 from config import DEBUG, config
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -135,8 +135,8 @@ def custom_openapi():
     return app.openapi_schema
 
 
-app.openapi = custom_openapi
-app.debug = DEBUG
+# app.openapi = custom_openapi
+# app.debug = DEBUG
 origins = [
     # 'http://localhost:3000',
     # 'http://avl-exam.tk',
@@ -155,7 +155,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-app.include_router(api_router, prefix='/api')
+# app.include_router(api_router, prefix='/api')
 
 
 @app.get('/api/version/')
