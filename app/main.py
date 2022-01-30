@@ -15,7 +15,7 @@ from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from starlette.middleware.sessions import SessionMiddleware
-from utils.log import setup_logging
+from utils.log import setup_logging, logger
 
 FAST_API_TITLE = 'AVL-Exam'
 VERSION = os.environ.get('TAG', '0.0.1')
@@ -138,9 +138,9 @@ def custom_openapi():
 app.openapi = custom_openapi
 app.debug = DEBUG
 origins = [
-    config.get('FRONTEND_BASE_URL'),
+    config.get('FRONTEND_BASE_URL')
 ]
-
+logger.info(f'frontned url: {config.get("FRONTEND_BASE_URL")}')
 secret_key = config.get('session_secret_key')
 app.add_middleware(SessionMiddleware, secret_key=secret_key)
 app.add_middleware(

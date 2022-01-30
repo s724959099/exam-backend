@@ -15,7 +15,6 @@ from fastapi.responses import RedirectResponse
 from fastapi_jwt_auth import AuthJWT
 from pony.orm import db_session
 from starlette.config import Config
-from utils.log import logger
 
 router = init_router_with_log()
 
