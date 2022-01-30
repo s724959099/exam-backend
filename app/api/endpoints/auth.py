@@ -15,6 +15,7 @@ from fastapi.responses import RedirectResponse
 from fastapi_jwt_auth import AuthJWT
 from pony.orm import db_session
 from starlette.config import Config
+from utils.log import logger
 
 router = init_router_with_log()
 
@@ -62,6 +63,7 @@ async def google_login(request: Request):
         str(request.base_url),
         '/api/auth/login/google/authorized/'
     )
+    logger.info(f'google redirect uri: {redirect_uri}')
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
