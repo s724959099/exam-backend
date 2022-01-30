@@ -139,10 +139,7 @@ app.openapi = custom_openapi
 app.debug = DEBUG
 origins = [
     'http://localhost:3000',
-    'http://avl-exam.tk',
-    'https://avl-exam.tk',
-    'http://avl-exam.tk/',
-    'https://avl-exam.tk/',
+    config.get("FRONTEND_BASE_URL")
 ]
 logger.info(f'frontned url: {config.get("FRONTEND_BASE_URL")}')
 secret_key = config.get('session_secret_key')
@@ -154,7 +151,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-# app.include_router(api_router, prefix='/api')
+app.include_router(api_router, prefix='/api')
 
 
 @app.get('/api/version/')
