@@ -13,7 +13,6 @@ from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi_jwt_auth import AuthJWT
-from pony.orm import db_session
 from starlette.config import Config
 
 router = init_router_with_log()
@@ -84,13 +83,14 @@ async def google_login_authorized(
     # get user or signup a user
     user = models.User.get(email=user_data['email'])
     if not user:
-        with db_session:
-            models.User(
-                email=user_data['email'],
-                name=user_data['name'],
-                register_from=3,  # google
-                verify=True,
-            )
+        models.User(
+            email=user_data['email'],
+            name=user_data['name'],
+            register_from=3,  # google
+            verify=True,
+        )
+    else:
+        user.login_count += 1
 
     access_token = authorize.create_access_token(subject=user_data['email'])
     refresh_token = authorize.create_refresh_token(subject=user_data['email'])
@@ -134,13 +134,14 @@ async def facebook_login_authorized(
     # # get user or signup a user
     user = models.User.get(email=user_data['email'])
     if not user:
-        with db_session:
-            models.User(
-                email=user_data['email'],
-                name=user_data['name'],
-                register_from=2,  # facebook
-                verify=True,
-            )
+        models.User(
+            email=user_data['email'],
+            name=user_data['name'],
+            register_from=2,  # facebook
+            verify=True,
+        )
+    else:
+        user.login_count += 1
 
     access_token = authorize.create_access_token(subject=user_data['email'])
     refresh_token = authorize.create_refresh_token(subject=user_data['email'])
@@ -153,7 +154,6 @@ async def facebook_login_authorized(
     return response
 
 
-@db_session
 @router.post(
     '/login/',
     name='Login'
@@ -175,6 +175,7 @@ async def login(
         verify=True,
         deleted=False,
     )
+    user.login_count += 1
     if not user or not user.check_password(user_login.password):
         raise HTTPException(status_code=401, detail='Bad email or password')
 
@@ -200,8 +201,7 @@ async def refresh(authorize: AuthJWT = Depends()):
     user = models.User.get(email=current_user, deleted=False)
     # update user last_login_time
     if user:
-        with db_session:
-            user.last_login_time = datetime.datetime.now()
+        user.last_login_time = datetime.datetime.now()
 
     # Set the JWT cookies in the response
     authorize.set_access_cookies(access_token)

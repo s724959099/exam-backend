@@ -16,7 +16,7 @@ from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from pony.orm import db_session
 from starlette.middleware.sessions import SessionMiddleware
-from utils.log import logger, setup_logging
+from utils.log import setup_logging
 
 FAST_API_TITLE = 'AVL-Exam'
 VERSION = os.environ.get('TAG', '0.0.1')

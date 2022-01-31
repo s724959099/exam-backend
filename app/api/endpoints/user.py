@@ -12,13 +12,11 @@ from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
-from pony.orm import db_session
 from utils import encrypt, mail
 
 router = init_router_with_log()
 
 
-@db_session
 @router.get(
     '/profile/',
     name='Self User profile',
@@ -53,7 +51,6 @@ async def get_users(
     return await page.paginate(query)
 
 
-@db_session
 @router.post(
     '/reset-password/',
     name='Reset password'
@@ -67,7 +64,7 @@ async def reset_password(
     Raises:
         422 -> password is not correct
     """
-    user = update_user_from_jwt(authorize, use_db_session=False)
+    user = update_user_from_jwt(authorize)
     if user.register_from != 1:
         raise HTTPException(
             status_code=422,
@@ -95,16 +92,15 @@ async def signup(
     hash_password = encrypt.get_hash(usersignup.password, salt)
     verify_id = str(uuid.uuid4())
     verify_url = f'{config.get("FRONTEND_BASE_URL")}/user/verify/{verify_id}'
-    with db_session:
-        models.User(
-            email=usersignup.email,
-            name=usersignup.name,
-            register_from=1,
-            password=hash_password,
-            salt=encrypt.transfter_salt_to_str(salt),
-            verify=False,
-            verify_id=verify_id
-        )
+    models.User(
+        email=usersignup.email,
+        name=usersignup.name,
+        register_from=1,
+        password=hash_password,
+        salt=encrypt.transfter_salt_to_str(salt),
+        verify=False,
+        verify_id=verify_id
+    )
     mail.send_email(
         to=usersignup.email,
         subject='Verify your account',
@@ -127,11 +123,11 @@ async def verify(
     user = models.User.get(verify_id=verify_id, deleted=False)
     if not user:
         return JSONResponse(status_code=404, content=dict(msg='not found'))
-    with db_session:
-        user.updated_at = datetime.datetime.now()
-        user.verify = True
-        user.verify_id = None
-        user.last_login_time = datetime.datetime.now()
+    user.updated_at = datetime.datetime.now()
+    user.verify = True
+    user.verify_id = None
+    user.login_count += 1
+    user.last_login_time = datetime.datetime.now()
     access_token = authorize.create_access_token(subject=user.email)
     refresh_token = authorize.create_refresh_token(subject=user.email)
 
