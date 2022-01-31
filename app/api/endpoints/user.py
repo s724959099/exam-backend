@@ -4,7 +4,10 @@ Usr api
 import datetime
 import uuid
 
-from api.deps import Pagination, get_pagination_schema, update_user_from_jwt
+from api.deps import (Pagination,
+                      get_pagination_schema,
+                      update_user_from_jwt,
+                      create_user_record)
 from api.route_handler import init_router_with_log
 from config import config
 from db import models, schemas
@@ -126,8 +129,9 @@ async def verify(
     user.updated_at = datetime.datetime.now()
     user.verify = True
     user.verify_id = None
+    # verify and to dashbaord
     user.login_count += 1
-    user.last_login_time = datetime.datetime.now()
+    create_user_record(user)
     access_token = authorize.create_access_token(subject=user.email)
     refresh_token = authorize.create_refresh_token(subject=user.email)
 

@@ -5,7 +5,7 @@ db with postgres
 import datetime
 
 from config import config
-from pony.orm import Database, Optional, Required
+from pony.orm import Database, Optional, Required, Set
 from utils import encrypt
 
 db = Database()
@@ -27,6 +27,7 @@ class User(db.Entity):
     updated_at = Optional(datetime.datetime, nullable=True)
     deleted = Optional(bool, default=False)
     deleted_at = Optional(datetime.datetime, nullable=True)
+    records = Set('UserActivieRecord')
 
     def check_password(self, raw_password: str) -> bool:
         """
@@ -43,6 +44,13 @@ class User(db.Entity):
         return hashed_password == self.password
 
 
+class UserActivieRecord(db.Entity):
+    """UserActivieRecord table"""
+    _table_ = 'UserActivieRecord'
+    user = Required(User)
+    created_at = Required(datetime.datetime, default=datetime.datetime.now)
+
+
 db.bind(
     provider='postgres',
     user=config.get('DB_USER'),
@@ -50,4 +58,4 @@ db.bind(
     host=config.get('DB_HOST'),
     port=config.get('DB_PORT'),
     database=config.get('DB_DATABASE_NAME'))
-db.generate_mapping()
+db.generate_mapping(create_tables=True)

@@ -11,6 +11,14 @@ from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel, Field
 
 
+def create_user_record(user: models.User):
+    """Update login time and create new user active record"""
+    user.last_login_time = datetime.datetime.now()
+    models.UserActivieRecord(
+        user=user
+    )
+
+
 def update_user_from_jwt(authorize: AuthJWT):
     """
     Update user by authorize.get_jwt_subject()
@@ -28,7 +36,7 @@ def update_user_from_jwt(authorize: AuthJWT):
     email = authorize.get_jwt_subject()
     user = models.User.get(email=email, deleted=False)
     if user:
-        user.last_login_time = datetime.datetime.now()
+        create_user_record(user)
 
     return user
 

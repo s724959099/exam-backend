@@ -4,7 +4,7 @@ Auth api
 import datetime
 from urllib.parse import urljoin
 
-from api.deps import update_user_from_jwt
+from api.deps import update_user_from_jwt, create_user_record
 from api.route_handler import init_router_with_log
 from authlib.integrations.starlette_client import OAuth
 from config import config
@@ -91,6 +91,7 @@ async def google_login_authorized(
         )
     else:
         user.login_count += 1
+    create_user_record(user)
 
     access_token = authorize.create_access_token(subject=user_data['email'])
     refresh_token = authorize.create_refresh_token(subject=user_data['email'])
@@ -143,6 +144,7 @@ async def facebook_login_authorized(
     else:
         user.login_count += 1
 
+    create_user_record(user)
     access_token = authorize.create_access_token(subject=user_data['email'])
     refresh_token = authorize.create_refresh_token(subject=user_data['email'])
 
@@ -175,10 +177,12 @@ async def login(
         verify=True,
         deleted=False,
     )
-    user.login_count += 1
+
     if not user or not user.check_password(user_login.password):
         raise HTTPException(status_code=401, detail='Bad email or password')
 
+    user.login_count += 1
+    create_user_record(user)
     access_token = authorize.create_access_token(subject=user_login.email)
     refresh_token = authorize.create_refresh_token(subject=user_login.email)
 
@@ -200,8 +204,9 @@ async def refresh(authorize: AuthJWT = Depends()):
     refresh_token = authorize.create_refresh_token(subject=current_user)
     user = models.User.get(email=current_user, deleted=False)
     # update user last_login_time
-    if user:
-        user.last_login_time = datetime.datetime.now()
+    if not user:
+        raise HTTPException(status_code=404, detail='No found user')
+    create_user_record(user)
 
     # Set the JWT cookies in the response
     authorize.set_access_cookies(access_token)
