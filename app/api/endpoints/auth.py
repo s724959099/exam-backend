@@ -119,7 +119,7 @@ async def facebook_login(request: Request):
 )
 async def facebook_login_authorized(
         request: Request,
-        # authorize: AuthJWT = Depends()
+        authorize: AuthJWT = Depends()
 ):
     """
     Get facebook authorized
@@ -128,30 +128,29 @@ async def facebook_login_authorized(
     """
     # get user from token
     token = await oauth.facebook.authorize_access_token(request)
-    user_data = await oauth.facebook.parse_id_token(request, token)
-    return {
-        'user': user_data
-    }
+    res = await oauth.facebook.get('me?fields=name,email,picture', token=token)
+    user_data = res.json()
+
     # # get user or signup a user
-    # user = models.User.get(email=user_data['email'])
-    # if not user:
-    #     with db_session:
-    #         models.User(
-    #             email=user_data['email'],
-    #             name=user_data['name'],
-    #             register_from=2,  # facebook
-    #             verify=True,
-    #         )
-    #
-    # access_token = authorize.create_access_token(subject=user_data['email'])
-    # refresh_token = authorize.create_refresh_token(subject=user_data['email'])
-    #
-    # # Set the JWT cookies in the response
-    # frontend_uri = urljoin(config.get('FRONTEND_BASE_URL'), '/dashboard')
-    # response = RedirectResponse(frontend_uri)
-    # authorize.set_access_cookies(access_token, response)
-    # authorize.set_refresh_cookies(refresh_token, response)
-    # return response
+    user = models.User.get(email=user_data['email'])
+    if not user:
+        with db_session:
+            models.User(
+                email=user_data['email'],
+                name=user_data['name'],
+                register_from=2,  # facebook
+                verify=True,
+            )
+
+    access_token = authorize.create_access_token(subject=user_data['email'])
+    refresh_token = authorize.create_refresh_token(subject=user_data['email'])
+
+    # Set the JWT cookies in the response
+    frontend_uri = urljoin(config.get('FRONTEND_BASE_URL'), '/dashboard')
+    response = RedirectResponse(frontend_uri)
+    authorize.set_access_cookies(access_token, response)
+    authorize.set_refresh_cookies(refresh_token, response)
+    return response
 
 
 @db_session
@@ -220,18 +219,3 @@ async def logout(authorize: AuthJWT = Depends()):
     update_user_from_jwt(authorize)
     authorize.unset_jwt_cookies()
     return {'msg': 'Successfully logout'}
-
-
-@router.get(
-    '/demo/',
-    name='demo'
-)
-async def demo(
-):
-    """TODO"""
-    user = models.User.get(
-        deleted=False,
-    )
-    return {
-        'user': user is not None
-    }

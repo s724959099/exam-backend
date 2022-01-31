@@ -141,10 +141,8 @@ app.debug = DEBUG
 origins = [
     'http://localhost:3000',
     'https://avl-exam.tk',
-    'http://avl-exam.tk/',
     'https://avl-exam.tk/',
 ]
-logger.info(f'frontned url: {config.get("FRONTEND_BASE_URL")}')
 secret_key = config.get('session_secret_key')
 app.add_middleware(SessionMiddleware, secret_key=secret_key)
 app.add_middleware(
