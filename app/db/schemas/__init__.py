@@ -4,6 +4,7 @@ from .user_login import UserLogin
 from .user_reset_password import UserResetPassword
 from .user_response import UserResponse
 from .user_signup import UserSignup
+from .user_update import UserUpdate
 
 __all__ = [
     'Settings',
@@ -11,4 +12,5 @@ __all__ = [
     'UserSignup',
     'UserResponse',
     'UserResetPassword',
+    'UserUpdate',
 ]

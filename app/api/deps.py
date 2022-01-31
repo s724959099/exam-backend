@@ -13,10 +13,10 @@ from pydantic import BaseModel, Field
 
 def create_user_record(user: models.User):
     """Update login time and create new user active record"""
-    user.last_login_time = datetime.datetime.now()
-    models.UserActivieRecord(
+    record = models.UserActivieRecord(
         user=user
     )
+    user.last_login_time = record.created_at
 
 
 def update_user_from_jwt(authorize: AuthJWT):

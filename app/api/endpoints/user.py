@@ -83,6 +83,25 @@ async def reset_password(
     return {'msg': 'success'}
 
 
+@router.put(
+    '/',
+    name='update self user'
+)
+async def update_self_user(
+        user_update: schemas.UserUpdate,
+        authorize: AuthJWT = Depends(),
+):
+    """
+    Uupdate suer user
+    Raises:
+        422 -> password is not correct
+    """
+    user = update_user_from_jwt(authorize)
+    user.name = user_update.name
+    user.updated_at = datetime.datetime.now()
+    return {'msg': 'success'}
+
+
 @router.post(
     '/signup/',
     name='Signup'

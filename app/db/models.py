@@ -27,7 +27,7 @@ class User(db.Entity):
     updated_at = Optional(datetime.datetime, nullable=True)
     deleted = Optional(bool, default=False)
     deleted_at = Optional(datetime.datetime, nullable=True)
-    records = Set('UserActivieRecord')
+    records = Set('UserActivieRecord', reverse='user', lazy=True)
 
     def check_password(self, raw_password: str) -> bool:
         """
@@ -47,7 +47,7 @@ class User(db.Entity):
 class UserActivieRecord(db.Entity):
     """UserActivieRecord table"""
     _table_ = 'UserActivieRecord'
-    user = Required(User)
+    user = Required(User, column='user_id')
     created_at = Required(datetime.datetime, default=datetime.datetime.now)
 
 
