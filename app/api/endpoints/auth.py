@@ -17,16 +17,11 @@ from starlette.config import Config
 
 router = init_router_with_log()
 
-"""
-FACEBOOK_CLIENT_ID	Your Facebook client ID
-FACEBOOK_CLIENT_SECRET	Your Facebook client secret
-FACEBOOK_CLIENT_KWARGS	Configure scope and other things
-"""
 config_data = {
     'GOOGLE_CLIENT_ID': config.get('GOOGLE_CLIENT_ID'),
     'GOOGLE_CLIENT_SECRET': config.get('GOOGLE_CLIENT_SECRET'),
-    'FACEBOOK_CLIENT_ID': '368799821266751',
-    'FACEBOOK_CLIENT_SECRET': 'cb8165436131276655ea979abd7fb0fd',
+    'FACEBOOK_CLIENT_ID': config.get('FACEBOOK_CLIENT_ID'),
+    'FACEBOOK_CLIENT_SECRET': config.get('FACEBOOK_CLIENT_SECRET'),
 }
 starlette_config = Config(environ=config_data)
 oauth = OAuth(starlette_config)
