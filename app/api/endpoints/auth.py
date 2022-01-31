@@ -230,9 +230,10 @@ async def logout(authorize: AuthJWT = Depends()):
 async def demo(
 ):
     """TODO"""
-    user = models.User.get(
-        deleted=False,
-    )
+    with db_session:
+        user = models.User.get(
+            deleted=False,
+        )
     return {
         'user': user is not None
     }
