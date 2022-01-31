@@ -220,3 +220,19 @@ async def logout(authorize: AuthJWT = Depends()):
     update_user_from_jwt(authorize)
     authorize.unset_jwt_cookies()
     return {'msg': 'Successfully logout'}
+
+
+@db_session
+@router.get(
+    '/demo/',
+    name='demo'
+)
+async def demo(
+):
+    """TODO"""
+    user = models.User.get(
+        deleted=False,
+    )
+    return {
+        'user': user is not None
+    }
