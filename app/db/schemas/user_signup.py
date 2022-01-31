@@ -4,6 +4,7 @@ import re
 
 from db import models
 from pydantic import BaseModel, Field, validator
+from db.schemas.utils import validate
 
 
 class UserSignup(BaseModel):
@@ -17,26 +18,8 @@ class UserSignup(BaseModel):
     # noinspection PyMethodParameters
     @validator('password')
     def password_validate(cls, v):  # pylint: disable=E0213 It is pydantic syntax
-        """
-        Password validate
-        - contains at least one lower character
-        - contains at least one upper character
-        - contains at least one digit character
-        - contains at least one special character
-        - contains at least 8 characters
-        """
-        if not re.findall(r'[a-z]', v):
-            raise ValueError('Contains at least one lower character')
-        elif not re.findall(r'[A-Z]', v):
-            raise ValueError('Contains at least one upper character')
-        elif not re.findall(r'[0-9]', v):
-            raise ValueError('Contains at least one digit character')
-        elif not re.findall(r'[^\w\s]', v):
-            raise ValueError('Contains at least one special character')
-        elif not re.findall(r'.{8,}', v):
-            raise ValueError('Contains at least 8 characters')
-
-        return v
+        """Validate passowrd"""
+        return validate.password_validate(v)
 
     # noinspection PyMethodParameters
     @validator('email')

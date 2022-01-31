@@ -78,7 +78,7 @@ async def google_login_authorized(
     # get user or signup a user
     user = models.User.get(email=user_data['email'])
     if not user:
-        models.User(
+        user = models.User(
             email=user_data['email'],
             name=user_data['name'],
             register_from=3,  # google
@@ -130,7 +130,7 @@ async def facebook_login_authorized(
     # # get user or signup a user
     user = models.User.get(email=user_data['email'])
     if not user:
-        models.User(
+        user = models.User(
             email=user_data['email'],
             name=user_data['name'],
             register_from=2,  # facebook
