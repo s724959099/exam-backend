@@ -14,8 +14,9 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
+from pony.orm import db_session
 from starlette.middleware.sessions import SessionMiddleware
-from utils.log import setup_logging, logger
+from utils.log import logger, setup_logging
 
 FAST_API_TITLE = 'AVL-Exam'
 VERSION = os.environ.get('TAG', '0.0.1')
@@ -184,6 +185,14 @@ def authjwt_exception_handler(
         status_code=status_code,
         content={'detail': exc.message}
     )
+
+
+@app.middleware('http')
+async def add_pony(request: Request, call_next):
+    """Add db session with each api"""
+    with db_session:
+        response = await call_next(request)
+        return response
 
 
 @app.on_event('startup')

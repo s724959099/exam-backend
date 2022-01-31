@@ -222,7 +222,6 @@ async def logout(authorize: AuthJWT = Depends()):
     return {'msg': 'Successfully logout'}
 
 
-@db_session
 @router.get(
     '/demo/',
     name='demo'
@@ -230,10 +229,9 @@ async def logout(authorize: AuthJWT = Depends()):
 async def demo(
 ):
     """TODO"""
-    with db_session:
-        user = models.User.get(
-            deleted=False,
-        )
+    user = models.User.get(
+        deleted=False,
+    )
     return {
         'user': user is not None
     }
