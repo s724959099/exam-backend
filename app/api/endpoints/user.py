@@ -16,6 +16,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from utils import encrypt, mail
+from pony.orm import count, select
 
 router = init_router_with_log()
 
@@ -195,17 +196,19 @@ async def statistics(
     ).count()
 
     # Average number of active session users in the last 7 days rolling.
-    before7_day_st = today - datetime.timedelta(days=7)
-    before7_day_st = before7_day_st.replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
-    last_7days_active_avg = models.User.select(
-        lambda x:
-        not x.deleted and
-        today_ed >= x.last_login_time and
-        x.last_login_time >= before7_day_st
-    ).count() / 7
-    last_7days_active_avg = round(last_7days_active_avg, 2)
+    count_list = []
+    for day in range(7):
+        that_day = today - datetime.timedelta(days=day)
+        day_st = that_day.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_ed = that_day.replace(hour=23, minute=59, second=59, microsecond=59)
+        total_count = select(
+            count(record.user.id) for record in models.UserActivieRecord
+            if record.created_at >= day_st and record.created_at <= day_ed
+        ).first()
+        count_list.append(total_count)
+
+    last_7days_active_avg = round(sum(count_list) / 7, 2)
+
     return {
         'sign_up_count': sign_up_count,
         'today_active_count': today_active_count,
