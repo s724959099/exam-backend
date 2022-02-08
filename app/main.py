@@ -140,8 +140,10 @@ app.openapi = custom_openapi
 app.debug = DEBUG
 origins = [
     'http://localhost:3000',
-    'https://avl-exam.tk',
     'https://avl-exam.tk/',
+    'https://avl-exam.tk',
+    'http://avl-exam.tk/',
+    'http://avl-exam.tk',
 ]
 secret_key = config.get('session_secret_key')
 app.add_middleware(SessionMiddleware, secret_key=secret_key)
