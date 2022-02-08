@@ -169,12 +169,10 @@ async def statistics(
 ):
     """
     Returns:
-        'sign_up_count': <int>, # Total number of users who have signed up. \n
-        'today_active_count': \n
-        <int>, # Total number of users with active sessions today. \n
-        'last_7days_active_avg': \n
-        <float> \n
-        # Average number of active session users in the last 7 days rolling. \n
+        sign_up_count: Total number of users who have signed up \n
+        today_active_count:  Total number of users with active sessions today \n
+        last_7days_active_avg:
+        Average number of active session users in the last 7 days rolling \n
     """
     update_user_from_jwt(authorize)
     # get sign up count
