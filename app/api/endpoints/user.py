@@ -31,7 +31,7 @@ async def profile(
     """
     Get self user profile \n
     Raises: \n
-        raise 404 for Not found \n
+        raise 404 -> Not found \n
     """
     user = update_user_from_jwt(authorize)
     if not user:
@@ -56,7 +56,8 @@ async def get_users(
 
 @router.post(
     '/reset-password/',
-    name='Reset password'
+    name='Reset password',
+    response_model=schemas.MessageResponse
 )
 async def reset_password(
         user_reset_password: schemas.UserResetPassword,
@@ -85,7 +86,8 @@ async def reset_password(
 
 @router.put(
     '/',
-    name='update self user'
+    name='update self user',
+    response_model=schemas.MessageResponse
 )
 async def update_self_user(
         user_update: schemas.UserUpdate,
@@ -104,7 +106,8 @@ async def update_self_user(
 
 @router.post(
     '/signup/',
-    name='Signup'
+    name='Signup',
+    response_model=schemas.MessageResponse
 )
 async def signup(
         usersignup: schemas.UserSignup
@@ -138,7 +141,8 @@ async def signup(
 
 @router.get(
     '/verify/{verify_id}/',
-    name='Verify user by verify id'
+    name='Verify user by verify id',
+    response_model=schemas.MessageResponse
 )
 async def verify(
         verify_id: str,
@@ -166,19 +170,14 @@ async def verify(
 # noinspection PyTypeChecker,PyChainedComparisons
 @router.get(
     '/statistics/',
-    name='Statistics'
+    name='Statistics',
+    response_model=schemas.StatisticsResponse
 )
 async def statistics(
         authorize: AuthJWT = Depends(),
 ):
-    # pylint: disable-next=line-too-long
     """
-    Returns: \n
-        { \n
-            sign_up_count: <total number of users who have signed up>, \n
-            today_active_count:  <total number of users with active sessions today>, \n
-            last_7days_active_avg: <average number of active session users in the last 7 days rolling> \n
-        }
+    Statistics data
     """
     update_user_from_jwt(authorize)
     # get sign up count

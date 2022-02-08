@@ -40,7 +40,7 @@ def custom_openapi():
         'AuthJWTCookieAccess': {
             'type': 'apiKey',
             'in': 'header',
-            'name': "'X-CSRF-TOKEN'"
+            'name': 'X-CSRF-TOKEN'
         },
         'AuthJWTCookieRefresh': {
             'type': 'apiKey',

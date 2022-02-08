@@ -153,7 +153,8 @@ async def facebook_login_authorized(
 
 @router.post(
     '/login/',
-    name='Login'
+    name='Login',
+    response_model=schemas.MessageResponse
 )
 async def login(
         user_login: schemas.UserLogin,
@@ -161,8 +162,6 @@ async def login(
 ):
     """
     Only for web login \n
-    Returns: \n
-        { access_token:<TOKEN>, refresh_token: <TOKEN>} \n
     Raises: \n
         HttpExcetpion(401) for fail \n
     """
@@ -187,7 +186,11 @@ async def login(
     return {'msg': 'Successfully login'}
 
 
-@router.post('/refresh/', name='Refresh Token')
+@router.post(
+    '/refresh/',
+    name='Refresh Token',
+    response_model=schemas.MessageResponse
+)
 async def refresh(authorize: AuthJWT = Depends()):
     """
     Refresh token by headers
@@ -209,7 +212,11 @@ async def refresh(authorize: AuthJWT = Depends()):
     return {'msg': 'The token has been refresh'}
 
 
-@router.delete('/logout/')
+@router.delete(
+    '/logout/',
+    name='Logout',
+    response_model=schemas.MessageResponse
+)
 async def logout(authorize: AuthJWT = Depends()):
     """
     Because the JWT are stored in an httponly cookie now, we cannot \n
