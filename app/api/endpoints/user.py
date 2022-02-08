@@ -168,11 +168,12 @@ async def statistics(
         authorize: AuthJWT = Depends(),
 ):
     """
-    Returns:
-        sign_up_count: Total number of users who have signed up \n
-        today_active_count:  Total number of users with active sessions today \n
-        last_7days_active_avg:
-        Average number of active session users in the last 7 days rolling \n
+    Returns: \n
+        { \n
+            sign_up_count: <total number of users who have signed up>, \n
+            today_active_count:  <total number of users with active sessions today>, \n
+            last_7days_active_avg: <average number of active session users in the last 7 days rolling> \n
+        }
     """
     update_user_from_jwt(authorize)
     # get sign up count
