@@ -1,5 +1,8 @@
 # AVL-Exam
-
+## Frontend
+https://avl-exam.tk/
+## Backend
+https://api.avl-exam.tk/
 
 # How to use
 ## add app/.env for local
