@@ -1,10 +1,9 @@
 """
 Auth api
 """
-import datetime
 from urllib.parse import urljoin
 
-from api.deps import update_user_from_jwt, create_user_record
+from api.deps import create_user_record, update_user_from_jwt
 from api.route_handler import init_router_with_log
 from authlib.integrations.starlette_client import OAuth
 from config import config
@@ -25,9 +24,10 @@ config_data = {
 }
 starlette_config = Config(environ=config_data)
 oauth = OAuth(starlette_config)
+google_url = 'https://accounts.google.com/.well-known/openid-configuration'
 oauth.register(
     name='google',
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',  # pylint: disable=C0301
+    server_metadata_url=google_url,
     client_kwargs={'scope': 'openid email profile'},
 )
 oauth.register(
@@ -68,8 +68,8 @@ async def google_login_authorized(
         authorize: AuthJWT = Depends()
 ):
     """
-    Get google authorized
-    Signup user if email is not found
+    Get google authorized \n
+    Signup user if email is not found \n
     Create new acctess_token in cookie then redirect to frontent
     """
     # get user from token
@@ -118,8 +118,8 @@ async def facebook_login_authorized(
         authorize: AuthJWT = Depends()
 ):
     """
-    Get facebook authorized
-    Signup user if email is not found
+    Get facebook authorized \n
+    Signup user if email is not found \n
     Create new acctess_token in cookie then redirect to frontent
     """
     # get user from token
@@ -160,11 +160,11 @@ async def login(
         authorize: AuthJWT = Depends(),
 ):
     """
-    Only for web login
-    Returns:
-        { access_token:<TOKEN>, refresh_token: <TOKEN>}
-    Raises:
-        HttpExcetpion(401) for fail
+    Only for web login \n
+    Returns: \n
+        { access_token:<TOKEN>, refresh_token: <TOKEN>} \n
+    Raises: \n
+        HttpExcetpion(401) for fail \n
     """
     user = models.User.get(
         email=user_login.email,
@@ -212,8 +212,8 @@ async def refresh(authorize: AuthJWT = Depends()):
 @router.delete('/logout/')
 async def logout(authorize: AuthJWT = Depends()):
     """
-    Because the JWT are stored in an httponly cookie now, we cannot
-    log the user out by simply deleting the cookies in the frontend.
+    Because the JWT are stored in an httponly cookie now, we cannot \n
+    log the user out by simply deleting the cookies in the frontend. \n
     We need the backend to send us a response to delete the cookies.
     """
     update_user_from_jwt(authorize)

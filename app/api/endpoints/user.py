@@ -4,10 +4,8 @@ Usr api
 import datetime
 import uuid
 
-from api.deps import (Pagination,
-                      get_pagination_schema,
-                      update_user_from_jwt,
-                      create_user_record)
+from api.deps import (Pagination, create_user_record, get_pagination_schema,
+                      update_user_from_jwt)
 from api.route_handler import init_router_with_log
 from config import config
 from db import models, schemas
@@ -15,8 +13,8 @@ from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
-from utils import encrypt, mail
 from pony.orm import count, select
+from utils import encrypt, mail
 
 router = init_router_with_log()
 
@@ -30,9 +28,9 @@ async def profile(
         authorize: AuthJWT = Depends(),
 ):
     """
-    Get self user profile
-    Raises:
-        raise 404 for Not found
+    Get self user profile \n
+    Raises: \n
+        raise 404 for Not found \n
     """
     user = update_user_from_jwt(authorize)
     if not user:
@@ -64,9 +62,9 @@ async def reset_password(
         authorize: AuthJWT = Depends(),
 ):
     """
-    User reset password
-    Raises:
-        422 -> password is not correct
+    User reset password \n
+    Raises: \n
+        422 -> password is not correct \n
     """
     user = update_user_from_jwt(authorize)
     if user.register_from != 1:
@@ -93,9 +91,9 @@ async def update_self_user(
         authorize: AuthJWT = Depends(),
 ):
     """
-    Uupdate suer user
-    Raises:
-        422 -> password is not correct
+    Uupdate suer user \n
+    Raises: \n
+        422 -> password is not correct \n
     """
     user = update_user_from_jwt(authorize)
     user.name = user_update.name
@@ -171,14 +169,12 @@ async def statistics(
 ):
     """
     Returns:
-         {
-            'sign_up_count': <int>, # Total number of users who have signed up.
-            'today_active_count':
-            <int>, # Total number of users with active sessions today.
-            'last_7days_active_avg':
-            <float>
-            # Average number of active session users in the last 7 days rolling.
-         }
+        'sign_up_count': <int>, # Total number of users who have signed up. \n
+        'today_active_count': \n
+        <int>, # Total number of users with active sessions today. \n
+        'last_7days_active_avg': \n
+        <float> \n
+        # Average number of active session users in the last 7 days rolling. \n
     """
     update_user_from_jwt(authorize)
     # get sign up count
@@ -200,7 +196,8 @@ async def statistics(
     for day in range(7):
         that_day = today - datetime.timedelta(days=day)
         day_st = that_day.replace(hour=0, minute=0, second=0, microsecond=0)
-        day_ed = that_day.replace(hour=23, minute=59, second=59, microsecond=59)
+        day_ed = that_day.replace(hour=23, minute=59, second=59,
+                                  microsecond=59)
         total_count = select(
             count(record.user.id) for record in models.UserActivieRecord
             if record.created_at >= day_st and record.created_at <= day_ed

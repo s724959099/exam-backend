@@ -3,8 +3,8 @@
 import re
 
 from db import models
-from pydantic import BaseModel, Field, validator
 from db.schemas.utils import validate
+from pydantic import BaseModel, Field, validator
 
 
 class UserSignup(BaseModel):

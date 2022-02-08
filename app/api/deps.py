@@ -1,7 +1,6 @@
 """
 API functions
 """
-import datetime
 import typing
 from typing import List, Optional
 

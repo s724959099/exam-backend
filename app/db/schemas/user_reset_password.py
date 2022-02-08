@@ -1,7 +1,7 @@
 """UserResetPassword schemas"""
 
-from pydantic import BaseModel, Field, validator
 from db.schemas.utils import validate
+from pydantic import BaseModel, Field, validator
 
 
 class UserResetPassword(BaseModel):
