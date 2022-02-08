@@ -98,7 +98,13 @@ async def update_self_user(
     Raises: \n
         422 -> password is not correct \n
     """
-    user = update_user_from_jwt(authorize)
+    try:
+        user = update_user_from_jwt(authorize)
+    except Exception as e:
+        from utils.log import logger
+        logger.exception('oops')
+        raise e
+
     user.name = user_update.name
     user.updated_at = datetime.datetime.now()
     return {'msg': 'success'}
