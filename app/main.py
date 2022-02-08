@@ -21,6 +21,18 @@ from utils.log import setup_logging
 FAST_API_TITLE = 'AVL-Exam'
 VERSION = os.environ.get('TAG', '0.0.1')
 app = FastAPI(title=FAST_API_TITLE, version=VERSION)
+origins = [
+    'http://localhost:3000',
+    'https://avl-exam.tk/',
+    'https://avl-exam.tk',
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
 
 
 def custom_openapi():
@@ -76,7 +88,8 @@ def custom_openapi():
             'securitySchemes': cookie_security_schemes
         }
 
-    api_router_ = [route for route in app.routes if isinstance(route, APIRoute)]
+    api_router_ = [route for route in app.routes if
+                   isinstance(route, APIRoute)]
 
     for route in api_router_:
         path = getattr(route, 'path')
@@ -137,23 +150,9 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
-app.debug = DEBUG
-origins = [
-    'http://localhost:3000',
-    'https://avl-exam.tk/',
-    'https://avl-exam.tk',
-    'http://avl-exam.tk/',
-    'http://avl-exam.tk',
-]
+
 secret_key = config.get('session_secret_key')
 app.add_middleware(SessionMiddleware, secret_key=secret_key)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
-)
 app.include_router(api_router, prefix='/api')
 
 
@@ -170,7 +169,8 @@ def get_version():
 # noinspection PyUnresolvedReferences,PyUnusedLocal
 @app.exception_handler(AuthJWTException)
 def authjwt_exception_handler(
-        request: Request,  # pylint:disable=W0613 request is necessary for exception_handler
+        request: Request,
+        # pylint:disable=W0613 request is necessary for exception_handler
         exc: AuthJWTException
 ):
     """
