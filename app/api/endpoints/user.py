@@ -3,6 +3,7 @@ Usr api
 """
 import datetime
 import uuid
+from urllib.parse import urljoin
 
 from api.deps import (Pagination, create_user_record, get_pagination_schema,
                       update_user_from_jwt)
@@ -112,7 +113,10 @@ async def signup(
     salt = encrypt.get_salt()
     hash_password = encrypt.get_hash(usersignup.password, salt)
     verify_id = str(uuid.uuid4())
-    verify_url = f'{config.get("FRONTEND_BASE_URL")}/user/verify/{verify_id}'
+    verify_url = urljoin(
+        config.get('FRONTEND_BASE_URL'),
+        f'/user/verify/{verify_id}'
+    )
     models.User(
         email=usersignup.email,
         name=usersignup.name,
@@ -167,6 +171,7 @@ async def verify(
 async def statistics(
         authorize: AuthJWT = Depends(),
 ):
+    # pylint: disable-next=line-too-long
     """
     Returns: \n
         { \n
